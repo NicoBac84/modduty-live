@@ -33,7 +33,13 @@ function broadcast(data) {
 
 // Endpoint utilisé par ton bot Nexus
 app.post("/push", (req, res) => {
-  console.log("Incoming push:", req.body);
+  const secret = req.headers["x-modduty-secret"];
+
+  if (secret !== process.env.MODDUTY_SECRET) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  console.log("Secure push received");
   broadcast(req.body);
   res.json({ status: "ok" });
 });
@@ -47,4 +53,5 @@ const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
   console.log("Server running on port", PORT);
+
 });
